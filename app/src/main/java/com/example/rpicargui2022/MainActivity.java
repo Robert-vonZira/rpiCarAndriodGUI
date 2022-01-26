@@ -18,6 +18,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import tech.gusavila92.websocketclient.WebSocketClient;
+import com.example.rpicargui2022.Vehicle;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -69,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
     public void sendCommand(String _command){
         webSocketClient.send(_command);
     }
-
     public void sendMessage(View view){
 
         EditText commandText = (EditText) findViewById(R.id.commandTxt);
@@ -81,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
         webSocketClient.send(message);
 
     }
-
     public void doMoveAction(float _x, float _y) {
         String status = "";
         ImageView cross = (ImageView) findViewById(R.id.cross);
@@ -122,10 +121,10 @@ public class MainActivity extends AppCompatActivity {
             status += "FWDspeed: " + speed;
         } else if (_y > (heightThird * 2)) {
             if (_y > height) {
-                speed = 100;
+                speed = -100;
                 // status += "RWDspeed: " + speed;
             } else {
-                speed = Math.round((_y - 2 * height / 3) / (heightThird) * 100);
+                speed = Math.round((_y - 2 * height / 3) / (heightThird) * 100)*-1;
             }
             status += "RWDspeed: " + speed;
             if (connected) {
@@ -142,18 +141,14 @@ public class MainActivity extends AppCompatActivity {
     public void setTextTerminal(String _message){
         TextView textView = findViewById(R.id.Feedkack);
         textView.setText(_message);
-
     }
-
     public void doStopMove() {
         if (connected) {
             String status="Stop: 0";
             sendCommand("vehicle.move 0");
             setTextTerminal(status);
-
         }
     }
-
     private void createWebSocketClient(String _ip) {
         URI uri;
         try {

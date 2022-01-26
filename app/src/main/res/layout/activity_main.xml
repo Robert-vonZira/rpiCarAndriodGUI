@@ -53,4 +53,34 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/txtSonarF"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="cm"
+        app:layout_constraintEnd_toStartOf="@+id/cross"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="490dp" />
+
+    <TextView
+        android:id="@+id/txtSonarL"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:text="cm"
+        app:layout_constraintEnd_toStartOf="@+id/txtSonarF"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="521dp" />
+
+    <TextView
+        android:id="@+id/txtSonarR"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="4dp"
+        android:text="cm"
+        app:layout_constraintEnd_toStartOf="@+id/cross"
+        app:layout_constraintStart_toEndOf="@+id/txtSonarF"
+        tools:layout_editor_absoluteY="521dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>

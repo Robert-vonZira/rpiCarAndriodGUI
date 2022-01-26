@@ -1,7 +1,6 @@
 package com.example.rpicargui2022;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -12,18 +11,17 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.textfield.TextInputLayout;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 
 import tech.gusavila92.websocketclient.WebSocketClient;
-import com.example.rpicargui2022.Vehicle;
 
 public class MainActivity extends AppCompatActivity {
 
     private WebSocketClient webSocketClient;
     private boolean connected = false;
+    private final Vehicle v = new Vehicle();
 
 
     @Override
@@ -47,25 +45,25 @@ public class MainActivity extends AppCompatActivity {
             @SuppressLint("ClickableViewAccessibility")
             @Override
                 public boolean onTouch(View view, MotionEvent event) {
-                final int actionPeformed = event.getAction();
-                switch (actionPeformed) {
+                final int actionPerformed = event.getAction();
+                switch (actionPerformed) {
                     case MotionEvent.ACTION_DOWN:
                         //touch down (merged with ACTION_Move
                     case MotionEvent.ACTION_MOVE: {
-                        //moving arround
+                        //moving around
                         doMoveAction(event.getX(), event.getY());
-                        break;
+                        return true;
                     }
                     case MotionEvent.ACTION_UP: {
                         //touched up
+                        //setTextTerminal("ACTION UP");
                         doStopMove();
-                        break;
-                    }
+                        return true;                    }
                 }
                 return true;
             }
         });
-    };
+    }
 
     public void sendCommand(String _command){
         webSocketClient.send(_command);
@@ -89,52 +87,51 @@ public class MainActivity extends AppCompatActivity {
         float heightThird = height / 3;
         float widthThird = width / 3;
 
+        //steering
+        //left third = left = 1, right third = right = 2, center third = straight = 0
         if (_x < widthThird) {
             if (connected) {
-                sendCommand("vehicle.steer 1");
+                sendCommand(v.getSteerCommand (1));
             }
             status += "Left, ";
         } else if (_x > (widthThird * 2)) {
             if (connected) {
-                sendCommand("vehicle.steer 2");
+                sendCommand(v.getSteerCommand(2));
             }
             status += "Right, ";
         } else {
             if (connected) {
-                sendCommand("vehicle.steer 0");
+                sendCommand(v.getSteerCommand(0));
             }
-
             status += "Straight, ";
         }
-        int speed = 0;
+        //moving
+        //lower third = reward = speed < 0 , upper third = forward = speed > 0 , center third = no moving = speed 0
 
+        int speed = 0;
         if (_y < heightThird) {
             if (_y < 1) {
                 speed = 100;
-
             } else {
                 speed = 100 - Math.round((_y / (heightThird) * 100));
                 if (connected) {
-                    sendCommand("vehicle.move " + speed);
-                }
+                    sendCommand(v.getMoveCommand(speed));                }
             }
-            status += "FWDspeed: " + speed;
+            status += "FWD speed: " + speed;
         } else if (_y > (heightThird * 2)) {
             if (_y > height) {
                 speed = -100;
-                // status += "RWDspeed: " + speed;
             } else {
                 speed = Math.round((_y - 2 * height / 3) / (heightThird) * 100)*-1;
             }
-            status += "RWDspeed: " + speed;
             if (connected) {
-                sendCommand("vehicle.move " + speed);
-            }
+                sendCommand(v.getMoveCommand(speed));            }
+            status += "RWD speed: " + speed;
         } else {
             if (connected) {
-                sendCommand("vehicle.move 0");
+                sendCommand(v.getMoveCommand(speed));
             }
-            status += "Stop: " + speed;
+            status += "Stop speed: " + speed;
         }
         setTextTerminal(status);
     }
@@ -143,11 +140,12 @@ public class MainActivity extends AppCompatActivity {
         textView.setText(_message);
     }
     public void doStopMove() {
+        String status="Straight, Stop speed: 0";
         if (connected) {
-            String status="Stop: 0";
-            sendCommand("vehicle.move 0");
-            setTextTerminal(status);
+            sendCommand(v.getMoveCommand(0));
+            sendCommand(v.getSteerCommand(0));
         }
+        setTextTerminal(status);
     }
     private void createWebSocketClient(String _ip) {
         URI uri;

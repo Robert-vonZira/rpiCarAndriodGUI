@@ -19,16 +19,18 @@ import tech.gusavila92.websocketclient.WebSocketClient;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static MainActivity instance;
     private WebSocketClient webSocketClient;
     private boolean connected = false;
     private final Vehicle v = new Vehicle();
+    private MessageHandler messageHandler = new MessageHandler();
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        instance = this;
 
         //createWebSocketClient("10.0.2.2");
         connected = false;
@@ -37,9 +39,6 @@ public class MainActivity extends AppCompatActivity {
         {
             cross = (ImageView) findViewById(R.id.cross);
         }
-
-
-
         cross.setOnTouchListener(new View.OnTouchListener() {
 
             @SuppressLint("ClickableViewAccessibility")
@@ -65,6 +64,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public static MainActivity getInstance() {
+        return instance;
+    }
     public void sendCommand(String _command){
         webSocketClient.send(_command);
     }
@@ -139,6 +141,18 @@ public class MainActivity extends AppCompatActivity {
         TextView textView = findViewById(R.id.Feedkack);
         textView.setText(_message);
     }
+    public void setTexttxtSonarF(String _message){
+        TextView textView = findViewById(R.id.txtSonarF);
+        textView.setText(_message);
+    }
+    public void setTexttxtSonarL(String _message){
+        TextView textView = findViewById(R.id.txtSonarL);
+        textView.setText(_message);
+    }
+    public void setTexttxtSonarR(String _message){
+        TextView textView = findViewById(R.id.txtSonarR);
+        textView.setText(_message);
+    }
     public void doStopMove() {
         String status="Straight, Stop speed: 0";
         if (connected) {
@@ -172,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
                         try {
                             TextView textView = findViewById(R.id.Feedkack);
-                            textView.setText(message);
+                            textView.setText(messageHandler.processMessage(message));
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
